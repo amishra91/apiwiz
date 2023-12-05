@@ -9,6 +9,11 @@ import {
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
+// ... (Component interfaces)
+interface DraggableCardProps {
+  task: Task;
+  onDragStart: (task: Task) => void;
+}
 interface BoardListProps {
   data: Task[];
 }
@@ -20,11 +25,6 @@ interface Task {
   assignee: string;
   startDate: string;
   status: string;
-}
-
-interface DraggableCardProps {
-  task: Task;
-  onDragStart: (task: Task) => void;
 }
 
 const DraggableCard = ({ task, onDragStart }: DraggableCardProps) => {
@@ -67,10 +67,6 @@ const BoardList = ({ data }: BoardListProps) => {
   const [tasks, setTasks] = useState<Task[]>(data);
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [updatedTasks, setUpdatedTasks] = useState<Task[]>([]);
-
-  // useEffect(() => {
-  //   setTasks(data);
-  // }, [data]);
 
   const listHeaders: string[] = [
     'backlog',
@@ -115,6 +111,7 @@ const BoardList = ({ data }: BoardListProps) => {
       const newStatus = e.currentTarget.dataset.status as string;
       const updatedTasks = tasks.filter((task) => task.id !== draggedTask.id);
       const updatedDraggedTask: Task = { ...draggedTask, status: newStatus };
+
       setUpdatedTasks([...updatedTasks, updatedDraggedTask]);
       setDraggedTask(null);
     }
@@ -125,11 +122,11 @@ const BoardList = ({ data }: BoardListProps) => {
   };
 
   return (
-    <div className="flex justify-between w-full gap-11">
+    <div className="flex flex-col md:flex-row justify-between w-full gap-4 md:gap-11">
       {listHeaders.map((item, index) => (
         <div
           key={index}
-          className="flex-1"
+          className="flex-1 md:w-1/4"
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           data-status={item}
@@ -154,7 +151,7 @@ const BoardList = ({ data }: BoardListProps) => {
               </span>
             </h3>
           </div>
-          <div className="max-h-[100vh] overflow-auto w-full">
+          <div className="max-h-[60vh] md:max-h-[100vh] overflow-auto w-full">
             {filterTasksByStatus(item).map((task) => (
               <DraggableCard
                 key={task.id}
@@ -163,7 +160,7 @@ const BoardList = ({ data }: BoardListProps) => {
               />
             ))}
           </div>
-          <Card className="mb-4 rounded-sm border-0 shadow-md cursor-pointer">
+          <Card className="mb-4 rounded-sm border-0 shadow-md cursor-pointer w-full">
             <CardHeader className="p-3">
               <CardTitle className="text-sm">
                 <button className="text-green-500">+ Add Task</button>
